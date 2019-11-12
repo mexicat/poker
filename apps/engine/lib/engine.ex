@@ -7,4 +7,8 @@ defmodule Engine do
   def status(game) do
     GenServer.call(game, :status)
   end
+
+  def start_game(game) do
+    GenServer.call(game, :start_game)
+  end
 end

@@ -3,10 +3,11 @@ defmodule Engine.Game do
   alias Engine.{Deck, Player}
 
   defstruct players: [
-              %Player{name: "jan", position: 0},
-              %Player{name: "sam", position: 1},
-              %Player{name: "lol", position: 2}
+              %Player{name: "jan"},
+              %Player{name: "sam"},
+              %Player{name: "lol"}
             ],
+            player_turn: 0,
             status: :initializing,
             small_blind: nil,
             big_blind: nil,
