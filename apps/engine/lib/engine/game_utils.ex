@@ -2,6 +2,8 @@ defmodule Engine.GameUtils do
   def next_player(player, players) do
     players =
       players
+      |> Enum.filter(fn {_, v} -> v.active end)
+      |> Enum.into(%{})
       |> Map.keys()
       |> Enum.sort()
 

@@ -11,16 +11,21 @@ defmodule Engine.GameServer do
   end
 
   def handle_call(:start_game, _from, game) do
-    {:ok, game} = Engine.Game.start_game(game)
-    {:reply, game, game}
+    game |> Engine.Game.start_game() |> reply(game)
   end
 
   def handle_call({:add_player, name}, _from, game) do
-    {:ok, game} = Engine.Game.add_player(game, name)
-    {:reply, :ok, game}
+    game |> Engine.Game.add_player(name) |> reply(game)
+  end
+
+  def handle_call({:check, player}, _from, game) do
+    game |> Engine.Game.check(player) |> reply(game)
   end
 
   def handle_call(:status, _from, game) do
     {:reply, game, game}
   end
+
+  defp reply({:ok, game}, _state), do: {:reply, game, game}
+  defp reply(error, state), do: {:reply, error, state}
 end

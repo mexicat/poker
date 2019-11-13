@@ -19,6 +19,10 @@ defmodule Engine do
     GenServer.call(game, {:add_player, name})
   end
 
+  def check(game, player) do
+    GenServer.call(game, {:check, player})
+  end
+
   def status(game) do
     GenServer.call(game, :status)
   end
