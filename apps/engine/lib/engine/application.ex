@@ -6,11 +6,14 @@ defmodule Engine.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
-    children = [worker(Engine.Server, [])]
+    children = [
+      {Registry, keys: :unique, name: Engine.GameRegistry},
+      {DynamicSupervisor, strategy: :one_for_one, name: Engine.GameSupervisor}
+    ]
 
     opts = [
-      name: Engine.Supervisor,
-      strategy: :simple_one_for_one
+      strategy: :one_for_one,
+      name: Engine.Supervisor
     ]
 
     Supervisor.start_link(children, opts)

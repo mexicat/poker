@@ -1,39 +1,57 @@
 defmodule Engine.Steps.StartTurn do
-  alias Engine.Deck
+  alias Engine.{Deck, Game}
   import Engine.GameUtils
   use Opus.Pipeline
 
-  step(:move_positions)
-  step(:set_blinds)
-  step(:give_cards)
-  step(:next, with: &Map.put(&1, :status, :pre_flop))
+  step :update_turn, with: &Map.put(&1, :turn, &1.turn + 1), if: :initializing?
+  step :move_positions, unless: :initializing?
+  step :set_current_player
+  step :set_blinds
+  step :give_cards
+  step :next, with: &Map.put(&1, :status, :pre_flop)
 
-  def move_positions(game = %{players: players}) do
-    [player | players] = players
-    %{game | players: players ++ [player]}
+  def initializing?(%Game{status: :initializing}), do: true
+  def initializing?(_), do: false
+
+  def move_positions(game = %Game{players: players, dealer: dealer}) do
+    dealer = next_player(dealer, players)
+    %{game | dealer: dealer}
   end
 
-  def set_blinds(game = %{players: players, small_blind: small_blind, big_blind: big_blind}) do
+  def set_current_player(game = %Game{players: players, dealer: dealer}) do
+    current_player = turn_start_player(dealer, players)
+    %{game | player_turn: current_player}
+  end
+
+  def set_blinds(
+        game = %Game{
+          players: players,
+          small_blind: small_blind,
+          big_blind: big_blind,
+          dealer: dealer
+        }
+      ) do
     players =
-      Enum.map(players |> Enum.with_index(), fn
-        {player, 1} ->
-          Map.put(player, :coins, player.coins - big_blind)
-
-        {player, 2} ->
-          Map.put(player, :coins, player.coins - small_blind)
-
-        {player, _} ->
-          player
-      end)
+      players
+      |> update_in(
+        [small_blind_player(dealer, players), Access.key(:coins)],
+        &(&1 - small_blind)
+      )
+      |> update_in(
+        [big_blind_player(dealer, players), Access.key(:coins)],
+        &(&1 - big_blind)
+      )
 
     %{game | players: players, pot: big_blind + small_blind}
   end
 
-  def give_cards(game = %{players: players, deck: deck}) do
+  def give_cards(game = %Game{players: players, deck: deck}) do
     players =
-      Enum.map(players, fn player ->
-        Map.put(player, :cards, Deck.draw_cards(deck, 2))
+      players
+      |> Enum.map(fn {id, player} ->
+        {id, Map.put(player, :hand, Deck.draw_cards(deck, 2))}
       end)
+      |> Enum.into(%{})
 
     %{game | players: players}
   end
