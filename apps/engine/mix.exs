@@ -26,7 +26,8 @@ defmodule Engine.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:opus, "~> 0.6"}
+      {:opus, "~> 0.6"},
+      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end
 end
