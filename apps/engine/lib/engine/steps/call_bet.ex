@@ -1,11 +1,11 @@
 defmodule Engine.Steps.CallBet do
   import Engine.GameUtils
-  alias Engine.Game
+  alias Engine.{Game, Steps}
   use Opus.Pipeline
 
   check :enough_coins_to_call?
   step :accept_call
-  link Engine.Steps.NextPlayer
+  link Steps.NextStep
 
   def enough_coins_to_call?(game = %Game{}) do
     player = current_player(game)

@@ -1,11 +1,12 @@
 defmodule Engine.Steps.Fold do
   import Engine.GameUtils
+  alias Engine.Steps
   use Opus.Pipeline
 
-  step :set_action
-  link Engine.Steps.NextPlayer
+  step :accept_fold
+  link Steps.NextStep
 
-  def set_action(game = %{}) do
+  def accept_fold(game = %{}) do
     game
     |> current_player()
     |> Map.put(:action, :fold)

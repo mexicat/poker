@@ -1,4 +1,4 @@
-defmodule Engine.Steps.NextPlayer do
+defmodule Engine.Steps.NextStep do
   import Engine.GameUtils
   alias Engine.Game
   use Opus.Pipeline

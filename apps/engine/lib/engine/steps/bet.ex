@@ -1,13 +1,13 @@
 defmodule Engine.Steps.Bet do
   import Engine.GameUtils
-  alias Engine.Game
+  alias Engine.{Game, Steps}
   use Opus.Pipeline
 
   check :at_least_big_blind?
   check :higher_than_current_bet?
   check :enough_coins_to_bet?
   step :accept_bet
-  link Engine.Steps.NextPlayer
+  link Steps.NextStep
 
   def at_least_big_blind?({%Game{big_blind: big_blind}, bet}) do
     bet >= big_blind
