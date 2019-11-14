@@ -32,4 +32,19 @@ defmodule Engine.GameUtils do
   def turn_start_player(dealer, players) do
     dealer |> big_blind_player(players) |> next_player(players)
   end
+
+  def turn_complete?(%Game{players: players, bet: _bet}) do
+    players
+    |> Map.values()
+    |> Enum.filter(& &1.active)
+    |> length() == 1
+  end
+
+  def phase_complete?(%Game{players: players, bet: bet}) do
+    players
+    |> Map.values()
+    |> Enum.filter(& &1.active)
+    |> Enum.filter(&(&1.bet != bet || &1.action == nil))
+    |> Enum.empty?()
+  end
 end

@@ -1,18 +1,19 @@
 defmodule Engine.Steps.NextPhase do
   import Engine.GameUtils
-  alias Engine.Game
+  alias Engine.{Game, Steps}
   use Opus.Pipeline
 
-  step :reset_bets
+  step :reset_players
   step :set_starting_player
-  # link Steps.ToRiver, if: &(&1.phase == :turn)
-  # link Steps.ToTurn, if: &(&1.phase == :flop)
-  link Engine.Steps.ToFlop, if: &(&1.phase == :preflop)
+  link Steps.Results, if: &(&1.phase == :river)
+  link Steps.ToRiver, if: &(&1.phase == :turn)
+  link Steps.ToTurn, if: &(&1.phase == :flop)
+  link Steps.ToFlop, if: &(&1.phase == :preflop)
 
-  def reset_bets(game = %Game{players: players}) do
+  def reset_players(game = %Game{players: players}) do
     players =
       players
-      |> Enum.map(fn {k, player} -> {k, Map.put(player, :bet, 0)} end)
+      |> Enum.map(fn {k, player} -> {k, %{player | bet: 0, action: nil}} end)
       |> Enum.into(%{})
 
     %{game | players: players, bet: 0}
