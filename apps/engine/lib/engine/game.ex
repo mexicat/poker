@@ -1,44 +1,75 @@
 defmodule Engine.Game do
   alias __MODULE__
-  alias Engine.{Deck, Player}
+  alias Engine.{Player, Steps}
 
   defstruct turn: 1,
             players: %{},
             player_turn: 0,
-            status: :initializing,
+            phase: :initializing,
             dealer: 0,
             small_blind: nil,
             big_blind: nil,
             pot: 0,
+            bet: 0,
+            board: [],
             deck: nil
 
-  def new_game() do
-    %Game{small_blind: 5, big_blind: 10, deck: Deck.start_link()}
+  def new_game(deck) do
+    %Game{
+      small_blind: 5,
+      big_blind: 10,
+      bet: 15,
+      deck: deck
+    }
   end
 
-  def add_player(game = %{status: :initializing, players: players}, name) do
+  def add_player(game = %Game{phase: :initializing, players: players}, name) do
     id = Enum.count(players)
     new_player = %Player{name: name}
     {:ok, %{game | players: Map.put(players, id, new_player)}}
   end
 
-  def add_player(_, _) do
+  def add_player(%Game{}, _) do
     {:error, :cannot_add_players_after_game_start}
   end
 
-  def check(game = %{player_turn: id}, _player = id) do
-    Engine.Steps.Check.call(game)
-  end
-
-  def check(_, _) do
-    {:error, :not_your_turn}
-  end
-
-  def start_game(%{status: :initializing, players: players}) when map_size(players) < 3 do
+  def start_game(%{phase: :initializing, players: players}) when map_size(players) < 3 do
     {:error, :not_enough_players}
   end
 
-  def start_game(game = %{status: :initializing}) do
-    Engine.Steps.StartTurn.call(game)
+  def start_game(game = %{phase: :initializing}) do
+    Steps.StartTurn.call(game)
+  end
+
+  def check(game = %Game{player_turn: id}, _player = id) do
+    Steps.Check.call(game)
+  end
+
+  def check(%Game{}, _) do
+    {:error, :not_your_turn}
+  end
+
+  def bet(game = %Game{player_turn: id}, _player = id, bet) do
+    Steps.Bet.call({game, bet})
+  end
+
+  def bet(%Game{}, _) do
+    {:error, :not_your_turn}
+  end
+
+  def call_bet(game = %Game{player_turn: id}, _player = id) do
+    Steps.CallBet.call(game)
+  end
+
+  def call_bet(%Game{}, _) do
+    {:error, :not_your_turn}
+  end
+
+  def fold(game = %Game{player_turn: id}, _player = id) do
+    Steps.Fold.call(game)
+  end
+
+  def fold(%Game{}, _) do
+    {:error, :not_your_turn}
   end
 end

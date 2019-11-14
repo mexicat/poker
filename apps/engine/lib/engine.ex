@@ -23,6 +23,18 @@ defmodule Engine do
     GenServer.call(game, {:check, player})
   end
 
+  def bet(game, player, bet) do
+    GenServer.call(game, {:bet, player, bet})
+  end
+
+  def call_bet(game, player) do
+    GenServer.call(game, {:call_bet, player})
+  end
+
+  def fold(game, player) do
+    GenServer.call(game, {:fold, player})
+  end
+
   def status(game) do
     GenServer.call(game, :status)
   end

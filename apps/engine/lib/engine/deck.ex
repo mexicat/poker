@@ -1,15 +1,19 @@
 defmodule Engine.Deck do
   alias Engine.Card
+  use Agent
 
   @type t :: [Card.t(), ...]
 
   def start_link() do
-    {:ok, pid} = Agent.start_link(&new/0)
-    pid
+    Agent.start_link(&new/0)
   end
 
   def draw_cards(agent, n) do
     Agent.get_and_update(agent, &do_draw_cards(&1, n))
+  end
+
+  def crash(agent) do
+    Agent.get(agent, fn a -> a.adsklds end)
   end
 
   defp new() do

@@ -3,15 +3,15 @@ defmodule Engine.Steps.StartTurn do
   import Engine.GameUtils
   use Opus.Pipeline
 
-  step :update_turn, with: &Map.put(&1, :turn, &1.turn + 1), if: :initializing?
+  step :update_turn, with: &Map.put(&1, :turn, &1.turn + 1), unless: :initializing?
   step :move_positions, unless: :initializing?
   step :set_current_player
   step :set_blinds
   step :give_cards
-  step :next, with: &Map.put(&1, :status, :pre_flop)
+  step :next, with: &Map.put(&1, :phase, :preflop)
 
-  def initializing?(%Game{status: :initializing}), do: true
-  def initializing?(_), do: false
+  def initializing?(%Game{phase: :initializing}), do: true
+  def initializing?(%Game{}), do: false
 
   def move_positions(game = %Game{players: players, dealer: dealer}) do
     dealer = next_player(dealer, players)
@@ -37,9 +37,17 @@ defmodule Engine.Steps.StartTurn do
         [small_blind_player(dealer, players), Access.key(:coins)],
         &(&1 - small_blind)
       )
+      |> put_in(
+        [small_blind_player(dealer, players), Access.key(:bet)],
+        small_blind
+      )
       |> update_in(
         [big_blind_player(dealer, players), Access.key(:coins)],
         &(&1 - big_blind)
+      )
+      |> put_in(
+        [big_blind_player(dealer, players), Access.key(:bet)],
+        big_blind
       )
 
     %{game | players: players, pot: big_blind + small_blind}
