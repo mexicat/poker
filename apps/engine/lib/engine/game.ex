@@ -11,6 +11,7 @@ defmodule Engine.Game do
             big_blind: nil,
             pot: 0,
             bet: 0,
+            winners: [],
             board: [],
             deck: nil
 

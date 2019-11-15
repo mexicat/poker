@@ -19,7 +19,7 @@ defmodule Engine.Steps.StartTurn do
   end
 
   def set_current_player(game = %Game{players: players, dealer: dealer}) do
-    current_player = turn_start_player(dealer, players)
+    current_player = turn_start_player_id(dealer, players)
     %{game | player_turn: current_player}
   end
 
@@ -31,26 +31,24 @@ defmodule Engine.Steps.StartTurn do
           dealer: dealer
         }
       ) do
-    players =
-      players
-      |> update_in(
-        [small_blind_player(dealer, players), Access.key(:coins)],
-        &(&1 - small_blind)
-      )
-      |> put_in(
-        [small_blind_player(dealer, players), Access.key(:bet)],
-        small_blind
-      )
-      |> update_in(
-        [big_blind_player(dealer, players), Access.key(:coins)],
-        &(&1 - big_blind)
-      )
-      |> put_in(
-        [big_blind_player(dealer, players), Access.key(:bet)],
-        big_blind
-      )
+    sb_id = small_blind_player_id(dealer, players)
+    bb_id = big_blind_player_id(dealer, players)
 
-    %{game | players: players, pot: big_blind + small_blind}
+    sb_player =
+      players
+      |> Map.get(sb_id)
+      |> Map.update!(:coins, &(&1 - small_blind))
+      |> Map.put(:bet, small_blind)
+
+    bb_player =
+      players
+      |> Map.get(bb_id)
+      |> Map.update!(:coins, &(&1 - big_blind))
+      |> Map.put(:bet, big_blind)
+
+    players = players |> Map.put(sb_id, sb_player) |> Map.put(bb_id, bb_player)
+
+    %{game | players: players, pot: game.pot + big_blind + small_blind}
   end
 
   def give_cards(game = %Game{players: players, deck: deck}) do

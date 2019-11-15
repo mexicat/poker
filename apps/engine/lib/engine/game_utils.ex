@@ -21,23 +21,39 @@ defmodule Engine.GameUtils do
     Map.get(players, player)
   end
 
-  def small_blind_player(dealer, players) do
+  def small_blind_player_id(dealer, players) do
     dealer |> next_player(players)
   end
 
-  def big_blind_player(dealer, players) do
-    dealer |> small_blind_player(players) |> next_player(players)
+  def big_blind_player_id(dealer, players) do
+    dealer |> small_blind_player_id(players) |> next_player(players)
   end
 
-  def turn_start_player(dealer, players) do
-    dealer |> big_blind_player(players) |> next_player(players)
+  def turn_start_player_id(dealer, players) do
+    dealer |> big_blind_player_id(players) |> next_player(players)
   end
 
-  def turn_complete?(%Game{players: players, bet: _bet}) do
+  def remaining_players(%Game{players: players}) do
     players
-    |> Map.values()
-    |> Enum.filter(& &1.active)
-    |> length() == 1
+    |> Enum.filter(fn {_, player} -> player.active end)
+    |> Map.new()
+  end
+
+  def one_player_remaining?(game = %Game{}) do
+    game
+    |> remaining_players()
+    |> map_size() == 1
+  end
+
+  def reset_players(game = %Game{players: players}) do
+    players =
+      players
+      |> Enum.map(fn {k, player} ->
+        {k, %{player | bet: 0, action: nil, active: true}}
+      end)
+      |> Enum.into(%{})
+
+    %{game | players: players, bet: 0}
   end
 
   def phase_complete?(%Game{players: players, bet: bet}) do
