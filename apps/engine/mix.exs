@@ -27,6 +27,7 @@ defmodule Engine.MixProject do
   defp deps do
     [
       {:opus, "~> 0.6"},
+      {:opus_graph, "~> 0.1", only: [:dev]},
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end

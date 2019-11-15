@@ -1,4 +1,3 @@
 # Poker
 
-**TODO: Add description**
-
+Multiplayer poker server in Elixir. In development.
