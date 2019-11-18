@@ -9,6 +9,7 @@ defmodule Engine.Steps.NextStep do
 
   skip :cleanup_stuff, if: &(&1.phase != :finished)
   step :distribute_coins
+  step :reset_board, with: &Map.put(&1, :board, [])
   step :cleanup_dead
   step :reset_players, with: &reset_players/1
   step :finish_game, if: &(map_size(&1.players) == 1)
