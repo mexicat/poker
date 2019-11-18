@@ -10,13 +10,24 @@ defmodule Engine.Score do
       fn card -> {Enum.count(cards, &(card.num == &1.num)), card.num} end,
       &>=/2
     )
-    |> check_min_straight
+    |> Enum.take(5)
+  end
+
+  def sort_for_straight_flush(cards) do
+    cards
+    |> Enum.sort_by(
+      fn card -> {Enum.count(cards, &(card.suit == &1.suit)), card.num} end,
+      &>=/2
+    )
+    |> check_min_straight()
+    |> Enum.take(5)
   end
 
   def sort_for_straight(cards) do
     cards
     |> Enum.uniq_by(fn %{num: n, suit: _} -> n end)
     |> Enum.sort(&>=/2)
+    |> check_min_straight()
     |> Enum.take(5)
   end
 
@@ -26,6 +37,7 @@ defmodule Engine.Score do
       fn card -> {Enum.count(cards, &(card.suit == &1.suit)), card.suit} end,
       &>=/2
     )
+    |> Enum.take(5)
   end
 
   def check_min_straight([
@@ -37,11 +49,21 @@ defmodule Engine.Score do
       ]),
       do: [c2, c3, c4, c5, %{c1 | num: 1}]
 
-  def check_min_straight(cards), do: cards
+  def check_min_straight(cards) do
+    with ace = %Card{} <- Enum.find(cards, nil, &(&1.num == 14)),
+         two = %Card{} <- Enum.find(cards, nil, &(&1.num == 2)),
+         three = %Card{} <- Enum.find(cards, nil, &(&1.num == 3)),
+         four = %Card{} <- Enum.find(cards, nil, &(&1.num == 4)),
+         five = %Card{} <- Enum.find(cards, nil, &(&1.num == 5)) do
+      [five, four, three, two, %{ace | num: 1}]
+    else
+      nil -> cards
+    end
+  end
 
   def score_hand(cards) do
     {score, ordered} =
-      cards |> sort_for_straight |> has_straight_flush? ||
+      cards |> sort_for_straight_flush |> has_straight_flush? ||
         cards |> sort |> has_four_of_a_kind? ||
         cards |> sort |> has_full_house? ||
         cards |> sort_by_color |> has_flush? ||
@@ -74,8 +96,6 @@ defmodule Engine.Score do
           %Card{num: a},
           %Card{num: a},
           %Card{num: a},
-          %Card{},
-          %Card{},
           %Card{}
         ] = cards
       ),
@@ -89,9 +109,7 @@ defmodule Engine.Score do
           %Card{num: a},
           %Card{num: a},
           %Card{num: b},
-          %Card{num: b},
-          %Card{},
-          %Card{}
+          %Card{num: b}
         ] = cards
       ),
       do: {:full_house, cards}
@@ -104,9 +122,7 @@ defmodule Engine.Score do
           %Card{suit: s},
           %Card{suit: s},
           %Card{suit: s},
-          %Card{suit: s},
-          %Card{},
-          %Card{}
+          %Card{suit: s}
         ] = cards
       ),
       do: {:flush, cards}
@@ -133,8 +149,6 @@ defmodule Engine.Score do
           %Card{num: a},
           %Card{num: a},
           %Card{},
-          %Card{},
-          %Card{},
           %Card{}
         ] = cards
       ),
@@ -148,8 +162,6 @@ defmodule Engine.Score do
           %Card{num: a},
           %Card{num: b},
           %Card{num: b},
-          %Card{},
-          %Card{},
           %Card{}
         ] = cards
       ),
@@ -161,8 +173,6 @@ defmodule Engine.Score do
         [
           %Card{num: a},
           %Card{num: a},
-          %Card{},
-          %Card{},
           %Card{},
           %Card{},
           %Card{}
