@@ -12,6 +12,10 @@ defmodule Engine.Deck do
     Agent.get_and_update(agent, &do_draw_cards(&1, n))
   end
 
+  def reset(agent) do
+    Agent.update(agent, fn _ -> new() end)
+  end
+
   def crash(agent) do
     Agent.get(agent, fn a -> a.adsklds end)
   end

@@ -5,6 +5,7 @@ defmodule Engine.Steps.StartTurn do
 
   step :update_turn, with: &Map.put(&1, :turn, &1.turn + 1), unless: :initializing?
   step :move_positions, unless: :initializing?
+  tee :reset_deck, with: &Deck.reset(&1.deck), unless: :initializing
   step :set_current_player
   step :set_blinds
   step :give_cards

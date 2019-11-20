@@ -16,7 +16,10 @@ defmodule Engine.GameServer do
   end
 
   def handle_call({:add_player, name}, _from, game) do
-    game |> Engine.Game.add_player(name) |> reply(game)
+    case Engine.Game.add_player(game, name) do
+      {:ok, id, new_game} -> {:reply, {:ok, id}, new_game}
+      error -> {:reply, error, game}
+    end
   end
 
   def handle_call({:check, player}, _from, game) do

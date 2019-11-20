@@ -27,7 +27,7 @@ defmodule Engine.Game do
   def add_player(game = %Game{phase: :initializing, players: players}, name) do
     id = Enum.count(players)
     new_player = %Player{name: name}
-    {:ok, %{game | players: Map.put(players, id, new_player)}}
+    {:ok, id, %{game | players: Map.put(players, id, new_player)}}
   end
 
   def add_player(%Game{}, _) do

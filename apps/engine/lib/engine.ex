@@ -1,5 +1,5 @@
 defmodule Engine do
-  defp via_tuple(name) do
+  def via_tuple(name) do
     {:via, Registry, {Engine.GameRegistry, name}}
   end
 
