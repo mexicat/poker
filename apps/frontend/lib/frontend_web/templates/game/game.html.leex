@@ -1,4 +1,17 @@
 <h1>Game <%= @game_name %></h1>
-<p>You are <%= @game.players[@player_id].name %></p>
+
+<%= if @game.phase == :initializing do %>
+  <div class="box">
+    <h2>Current players</h2>
+    <ul>
+      <%= for {i, player} <- @game.players do %>
+        <li><%= player.name %></li>
+      <% end %>
+    </ul>
+    <%= if map_size(@game.players) > 1 && game_admin?(@game, @player_id) do %>
+      <button phx-click="start_game">Start Game</button>
+    <% end %>
+  </div>
+<% end %>
 
 <%= inspect(@game) %>

@@ -12,7 +12,7 @@ config :frontend, FrontendWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "pz5hTigV6q3+DKOkn367v6TgzPFK+bJtICkqePKtblD3m9uf+YqBlBBRiN3o1mg5",
   render_errors: [view: FrontendWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Frontend.PubSub, adapter: Phoenix.PubSub.PG2],
+  pubsub: [name: FrontendWeb.PubSub, adapter: Phoenix.PubSub.PG2],
   live_view: [signing_salt: "DdGcEyNtX2U4ZGT5EQprMiGikkjsJ2Wt"]
 
 # Configures Elixir's Logger

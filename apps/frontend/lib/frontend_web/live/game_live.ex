@@ -10,17 +10,39 @@ defmodule FrontendWeb.GameLive do
   end
 
   def mount(%{game_name: game_name} = assigns, socket) do
-    # if connected?(socket) do
-    #   :ok = subscribe(FrontendWeb.PubSub, "game/#{game_name}")
-    # else
-    #   :ok = unsubscribe(FrontendWeb.PubSub, "game/#{game_name}")
-    # end
+    if connected?(socket) do
+      :ok = subscribe(FrontendWeb.PubSub, "game/#{game_name}")
+    else
+      :ok = unsubscribe(FrontendWeb.PubSub, "game/#{game_name}")
+    end
 
     {:ok, assign(socket, assigns)}
   end
 
-  def handle_info({:game_state_updated, game_state}, socket) do
-    {:noreply, assign(socket, :game_state, game_state)}
+  def handle_event("start_game", _, socket) do
+    game = Engine.via_tuple(socket.assigns.game_name)
+
+    case Engine.start_game(game) do
+      {:ok, game} -> update_clients_and_reply(game, socket)
+      error -> handle_error(error, socket)
+    end
+  end
+
+  def update_clients_and_reply(game, socket) do
+    update_clients(socket.assigns.game_name, game)
+    {:noreply, socket}
+  end
+
+  def update_clients(game_name, game) do
+    broadcast(
+      FrontendWeb.PubSub,
+      "game/#{game_name}",
+      {:game_state_updated, game}
+    )
+  end
+
+  def handle_info({:game_state_updated, game}, socket) do
+    {:noreply, assign(socket, :game, game)}
   end
 
   # def handle_event("draw_cards", _, %{assigns: assigns} = socket) do
