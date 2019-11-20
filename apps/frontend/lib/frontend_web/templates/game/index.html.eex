@@ -1,0 +1,14 @@
+<h1>Ye Olde Poker</h1>
+
+<%= f = form_for @conn, Routes.game_path(@conn, :new_game), method: :post %>
+<%= text_input f, :player_name %>
+<%= submit "New Game" %>
+</form>
+
+— or —
+
+<%= f = form_for @conn, Routes.game_path(@conn, :join_game), method: :post %>
+<%= text_input f, :game_name %>
+<%= text_input f, :player_name %>
+<%= submit "Join" %>
+</form>
