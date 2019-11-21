@@ -19,15 +19,6 @@ defmodule FrontendWeb.GameLive do
     {:ok, assign(socket, assigns)}
   end
 
-  def handle_event("start_game", _, socket) do
-    game = Engine.via_tuple(socket.assigns.game_name)
-
-    case Engine.start_game(game) do
-      {:ok, game} -> update_clients_and_reply(game, socket)
-      error -> handle_error(error, socket)
-    end
-  end
-
   def update_clients_and_reply(game, socket) do
     update_clients(socket.assigns.game_name, game)
     {:noreply, socket}
@@ -43,6 +34,56 @@ defmodule FrontendWeb.GameLive do
 
   def handle_info({:game_state_updated, game}, socket) do
     {:noreply, assign(socket, :game, game)}
+  end
+
+  def handle_event("start_game", _, socket) do
+    game = Engine.via_tuple(socket.assigns.game_name)
+
+    case Engine.start_game(game) do
+      {:ok, game} -> update_clients_and_reply(game, socket)
+      error -> handle_error(error, socket)
+    end
+  end
+
+  def handle_event("check", _, socket) do
+    game = Engine.via_tuple(socket.assigns.game_name)
+    player_id = socket.assigns.player_id
+
+    case Engine.check(game, player_id) do
+      {:ok, game} -> update_clients_and_reply(game, socket)
+      error -> handle_error(error, socket)
+    end
+  end
+
+  def handle_event("bet", %{"amount" => amount}, socket) do
+    game = Engine.via_tuple(socket.assigns.game_name)
+    player_id = socket.assigns.player_id
+    amount = String.to_integer(amount)
+
+    case Engine.bet(game, player_id, amount) do
+      {:ok, game} -> update_clients_and_reply(game, socket)
+      error -> handle_error(error, socket)
+    end
+  end
+
+  def handle_event("call_bet", _, socket) do
+    game = Engine.via_tuple(socket.assigns.game_name)
+    player_id = socket.assigns.player_id
+
+    case Engine.call_bet(game, player_id) do
+      {:ok, game} -> update_clients_and_reply(game, socket)
+      error -> handle_error(error, socket)
+    end
+  end
+
+  def handle_event("fold", _, socket) do
+    game = Engine.via_tuple(socket.assigns.game_name)
+    player_id = socket.assigns.player_id
+
+    case Engine.fold(game, player_id) do
+      {:ok, game} -> update_clients_and_reply(game, socket)
+      error -> handle_error(error, socket)
+    end
   end
 
   # def handle_event("draw_cards", _, %{assigns: assigns} = socket) do

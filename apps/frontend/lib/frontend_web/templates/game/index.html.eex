@@ -1,14 +1,16 @@
-<h1>Ye Olde Poker</h1>
+<div class="container mx-auto">
+<h1 class="text-4xl my-6">Ye Olde Poker</h1>
 
-<%= f = form_for @conn, Routes.game_path(@conn, :new_game), method: :post %>
-<%= text_input f, :player_name %>
-<%= submit "New Game" %>
+<%= f = form_for @conn, Routes.game_path(@conn, :new_game), method: :post, class: "my-5" %>
+<p class="my-2"><%= text_input f, :player_name, class: "bg-gray-300 py-2 px-4 rounded", placeholder: "your name" %></p>
+<p class="my-2"><%= submit "New Game", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %></p>
 </form>
 
 — or —
 
-<%= f = form_for @conn, Routes.game_path(@conn, :join_game), method: :post %>
-<%= text_input f, :game_name %>
-<%= text_input f, :player_name %>
-<%= submit "Join" %>
+<%= f = form_for @conn, Routes.game_path(@conn, :join_game), method: :post, class: "my-5" %>
+<p class="my-2"><%= text_input f, :game_name, class: "bg-gray-300 py-2 px-4 rounded", placeholder: "game name" %></p>
+<p class="my-2"><%= text_input f, :player_name, class: "bg-gray-300 py-2 px-4 rounded", placeholder: "your name" %></p>
+<p class="my-2"><%= submit "Join", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %></p>
 </form>
+</div>

@@ -1,17 +1,92 @@
-<h1>Game <%= @game_name %></h1>
+<div class="bg-gray-300 py-2">
+  <ul class="flex container mx-auto">
+    <li class="mr-4">Game: <b><%= @game_name %></b></li>
+    <li class="mr-4">Phase: <b><%= Atom.to_string(@game.phase) %></b></li>
+  </ul>
+</div>
 
-<%= if @game.phase == :initializing do %>
-  <div class="box">
-    <h2>Current players</h2>
-    <ul>
-      <%= for {i, player} <- @game.players do %>
-        <li><%= player.name %></li>
+<div class="container mx-auto px-4">
+  <%= if @game.phase == :initializing do %>
+    <div class="box">
+      <h2>Current players</h2>
+      <ul>
+        <%= for {_, player} <- @game.players do %>
+          <li><%= player.name %></li>
+        <% end %>
+      </ul>
+      <%= if map_size(@game.players) > 1 && game_admin?(@game, @player_id) do %>
+        <button phx-click="start_game">Start Game</button>
       <% end %>
-    </ul>
-    <%= if map_size(@game.players) > 1 && game_admin?(@game, @player_id) do %>
-      <button phx-click="start_game">Start Game</button>
-    <% end %>
-  </div>
-<% end %>
+    </div>
+  <% else %>
 
-<%= inspect(@game) %>
+    <div class="text-center text-3xl py-12">
+      <p>Pot: <%= @game.pot %></p>
+      <%= if @game.bet > 0 do %><p class="text-xl">Bet to match: <%= @game.bet %></p><% end %>
+      <%= if length(@game.board) > 0 do %>
+        <%= cards_to_repr(@game.board) %>
+      <% end %>
+    </div>
+
+
+    <div class="flex flex-row text-center">
+    <%= for {i, player} <- @game.players do %>
+      <div class="flex-1 mx-2 px-4 py-4 rounded-full <%= if i == @game.player_turn, do: "bg-gray-300" %>">
+        <b class="text-lg font-bold">
+          <%= player.name %>
+          <%= if @game.dealer == i do %><span class="ml-1 rounded-full text-sm text-black px-2 py-1 bg-yellow-400 font-bold">D</span><% end %>
+          <%= if @player_id == i do %><span class="ml-1 rounded-full text-sm text-white px-2 py-1 bg-gray-600 font-bold">You</span><% end %>
+        </b>
+        <p>
+          <%= player.coins %>
+          <%= if player.bet > 0, do: " (#{player.bet} in pot)" %>
+        </p>
+        <%= if i == @player_id do %>
+        <div class="text-xl">
+          <%= cards_to_repr(player.hand) %>
+        </div>
+        <% end %>
+        <%= if player.action do %>
+          <p>
+            <span class="rounded-full px-3 py-1 text-sm font-semibold bg-gray-500"><%= Atom.to_string(player.action) %></span>
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+    </div>
+  <% end %>
+  </div>
+
+  <div class="container mx-auto mt-4">
+
+
+  <%= if @game.phase != :initializing && current_player?(@game, @player_id) do %>
+    Your turn:
+
+    <%= if get_current_player(@game).bet == @game.bet do %>
+      <button phx-click="check" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Check</button>
+    <% else %>
+      <button phx-click="call_bet" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Call <%= @game.bet - get_current_player(@game).bet %></button>
+    <% end %>
+
+    <%= if get_current_player(@game).coins > (@game.bet - get_current_player(@game).bet) do %>
+      <form phx-submit="bet" class="inline">
+        <input type="number" name="amount" class="bg-gray-300 py-2 px-4 rounded w-auto" min="<%= minimum_bet(@game) %>" max="<%= get_current_player(@game).coins + get_current_player(@game).bet %>" value="<%= minimum_bet(@game) %>">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <%= if @game.bet > 0, do: "Raise", else: "Bet" %>
+        </button>
+      </form>
+    <% end %>
+
+    <button phx-click="fold" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Fold</button>
+
+  <% end %>
+
+</div>
+
+<div class="py-8"></div>
+
+<code>
+  <%= inspect(@game) %>
+
+</code>
