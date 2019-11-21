@@ -49,7 +49,7 @@ defmodule Engine.Steps.StartTurn do
 
     players = players |> Map.put(sb_id, sb_player) |> Map.put(bb_id, bb_player)
 
-    %{game | players: players, pot: game.pot + big_blind + small_blind}
+    %{game | players: players, pot: game.pot + big_blind + small_blind, bet: big_blind}
   end
 
   def give_cards(game = %Game{players: players, deck: deck}) do

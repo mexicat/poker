@@ -31,4 +31,25 @@ defmodule Engine.Card do
 
     %Card{num: num, suit: suit}
   end
+
+  def to_repr(%Card{num: num, suit: suit}) do
+    num = case num do
+      1 -> "A"
+      14 -> "A"
+      13 -> "K"
+      12 -> "Q"
+      11 -> "J"
+      x -> x
+    end
+
+    suit =
+      case suit do
+        :hearts -> "♥️"
+        :diamonds -> "♦️"
+        :clubs -> "♣️"
+        :spades -> "♠️"
+      end
+
+    "#{num}#{suit}"
+  end
 end
