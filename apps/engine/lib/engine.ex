@@ -10,9 +10,16 @@ defmodule Engine do
       |> List.to_string()
 
     {:ok, _} =
-      DynamicSupervisor.start_child(Engine.GameSupervisor, {Engine.GameServer, via_tuple(name)})
+      DynamicSupervisor.start_child(
+        Engine.GameSupervisor,
+        {Engine.GameServer, via_tuple(name)}
+      )
 
     via_tuple(name)
+  end
+
+  def add_logger(game, pid) do
+    GenServer.call(game, {:add_logger, pid})
   end
 
   def add_player(game, name) do

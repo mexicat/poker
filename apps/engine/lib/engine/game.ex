@@ -1,6 +1,6 @@
 defmodule Engine.Game do
   alias __MODULE__
-  alias Engine.{Player, Steps}
+  alias Engine.{GameUtils, Player, Steps}
 
   defstruct turn: 1,
             players: %{},
@@ -14,21 +14,27 @@ defmodule Engine.Game do
             winners: [],
             board: [],
             deck: nil,
-            log: []
+            log: nil
 
-  def new_game(deck) do
+  def new_game(deck, log \\ nil) do
     %Game{
       small_blind: 5,
       big_blind: 10,
       bet: 15,
-      deck: deck
+      deck: deck,
+      log: log
     }
   end
 
   def add_player(game = %Game{phase: :initializing, players: players}, name) do
     id = Enum.count(players)
     new_player = %Player{name: name}
-    {:ok, id, %{game | players: Map.put(players, id, new_player)}}
+
+    game =
+      %{game | players: Map.put(players, id, new_player)}
+      |> GameUtils.log("#{name} joined the game")
+
+    {:ok, id, game}
   end
 
   def add_player(%Game{}, _) do

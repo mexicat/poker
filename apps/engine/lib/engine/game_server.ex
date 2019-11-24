@@ -15,6 +15,10 @@ defmodule Engine.GameServer do
     game |> Engine.Game.start_game() |> reply(game)
   end
 
+  def handle_call({:add_logger, pid}, _from, game) when is_pid(pid) do
+    {:ok, %{game | log: pid}} |> reply(game)
+  end
+
   def handle_call({:add_player, name}, _from, game) do
     case Engine.Game.add_player(game, name) do
       {:ok, id, new_game} -> {:reply, {:ok, id, new_game}, new_game}

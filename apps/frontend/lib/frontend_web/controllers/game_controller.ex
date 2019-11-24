@@ -1,6 +1,7 @@
 defmodule FrontendWeb.GameController do
   use FrontendWeb, :controller
   alias Phoenix.LiveView.Controller
+  import Phoenix.PubSub
 
   def index(conn, _params) do
     render(conn, "index.html")
@@ -8,6 +9,11 @@ defmodule FrontendWeb.GameController do
 
   def new_game(conn, %{"player_name" => player_name}) do
     game = {:via, _, {_, game_name}} = Engine.new_game()
+
+    {:ok, log_server} =
+      Engine.LogServer.start_link(FrontendWeb.GameLive, :update_clients, game_name)
+
+    {:ok, _} = Engine.add_logger(game, log_server)
     {:ok, player_id, _} = Engine.add_player(game, player_name)
 
     conn

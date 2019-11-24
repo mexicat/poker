@@ -1,8 +1,11 @@
 defmodule Engine.GameUtils do
-  alias Engine.Game
+  alias Engine.{Game, LogServer}
 
-  def log(game = %Game{log: log}, msg) do
-    %{game | log: [msg | log]}
+  def log(game = %Game{log: nil}, _), do: game
+
+  def log(game = %Game{log: server}, msg) do
+    LogServer.log(server, msg, game)
+    game
   end
 
   def next_player(player, players) do
