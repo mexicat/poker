@@ -34,5 +34,6 @@ defmodule Engine.Steps.Bet do
     # back to the game struct here
     |> Map.put(:bet, bet)
     |> Map.update!(:pot, &(&1 + spent))
+    |> log("#{player.name} bet/raised to #{bet}")
   end
 end

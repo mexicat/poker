@@ -12,5 +12,6 @@ defmodule Engine.Steps.Fold do
     |> Map.put(:action, :fold)
     |> Map.put(:active, false)
     |> set_player(game)
+    |> log("#{current_player(game).name} folded")
   end
 end

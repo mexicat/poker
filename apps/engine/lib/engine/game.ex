@@ -13,7 +13,8 @@ defmodule Engine.Game do
             bet: 0,
             winners: [],
             board: [],
-            deck: nil
+            deck: nil,
+            log: []
 
   def new_game(deck) do
     %Game{

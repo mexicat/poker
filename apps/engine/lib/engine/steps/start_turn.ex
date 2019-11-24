@@ -6,9 +6,9 @@ defmodule Engine.Steps.StartTurn do
   step :update_turn, with: &Map.put(&1, :turn, &1.turn + 1), unless: :initializing?
   step :move_positions, unless: :initializing?
   tee :reset_deck, with: &Deck.reset(&1.deck), unless: :initializing
-  step :set_current_player
   step :set_blinds
   step :give_cards
+  step :set_current_player
   step :next, with: &Map.put(&1, :phase, :preflop)
 
   def initializing?(%Game{phase: :initializing}), do: true
@@ -16,12 +16,9 @@ defmodule Engine.Steps.StartTurn do
 
   def move_positions(game = %Game{players: players, dealer: dealer}) do
     dealer = next_player(dealer, players)
-    %{game | dealer: dealer}
-  end
 
-  def set_current_player(game = %Game{players: players, dealer: dealer}) do
-    current_player = turn_start_player_id(dealer, players)
-    %{game | player_turn: current_player}
+    %{game | dealer: dealer}
+    |> log("Moved the dealer")
   end
 
   def set_blinds(
@@ -50,6 +47,11 @@ defmodule Engine.Steps.StartTurn do
     players = players |> Map.put(sb_id, sb_player) |> Map.put(bb_id, bb_player)
 
     %{game | players: players, pot: game.pot + big_blind + small_blind, bet: big_blind}
+    |> log(
+      "#{bb_player.name} paid the big blind (#{big_blind}), #{sb_player.name} paid the small blind (#{
+        small_blind
+      })"
+    )
   end
 
   def give_cards(game = %Game{players: players, deck: deck}) do
@@ -61,5 +63,13 @@ defmodule Engine.Steps.StartTurn do
       |> Enum.into(%{})
 
     %{game | players: players}
+    |> log("Cards distributed to the players")
+  end
+
+  def set_current_player(game = %Game{players: players, dealer: dealer}) do
+    current_player = turn_start_player_id(dealer, players)
+
+    %{game | player_turn: current_player}
+    |> log("#{current_player(game).name}'s turn")
   end
 end

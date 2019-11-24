@@ -3,8 +3,8 @@ defmodule Engine.Steps.NextStep do
   alias Engine.{Game, Steps}
   use Opus.Pipeline
 
-  step :set_next_player, unless: &(!one_player_remaining?(&1) && phase_complete?(&1))
   link Steps.NextPhase, if: &(!one_player_remaining?(&1) && phase_complete?(&1))
+  step :set_next_player, unless: &(!one_player_remaining?(&1) && phase_complete?(&1))
   step :set_winner, if: &one_player_remaining?(&1)
 
   skip :cleanup_stuff, if: &(&1.phase != :finished)
@@ -16,13 +16,17 @@ defmodule Engine.Steps.NextStep do
   link Steps.StartTurn, if: &(map_size(&1.players) > 1)
 
   def set_next_player(game = %Game{player_turn: player, players: players}) do
-    %{game | player_turn: next_player(player, players)}
+    next_player = next_player(player, players)
+
+    %{game | player_turn: next_player}
+    |> log("#{player_id_to_name(game, next_player)}'s turn")
   end
 
   def set_winner(game = %Game{}) do
-    IO.puts(" SET WINNER ")
     winners = for {k, _} <- remaining_players(game), do: k
+
     %{game | winners: winners, phase: :finished}
+    |> log("Winner(s): #{game |> player_ids_to_names(winners) |> Enum.join(", ")}")
   end
 
   def distribute_coins(game = %Game{winners: winners, players: players, pot: pot}) do
@@ -40,15 +44,21 @@ defmodule Engine.Steps.NextStep do
       |> Enum.into(%{})
 
     %{game | players: players, pot: remainder, winners: []}
+    |> log("Distributed #{each} coins to each winner")
   end
 
   def cleanup_dead(game = %Game{players: players}) do
-    players =
+    new_players =
       players
       |> Enum.reject(fn {_k, player} -> player.coins <= 0 end)
       |> Enum.into(%{})
 
-    %{game | players: players}
+    if players != new_players do
+      %{game | players: new_players}
+      |> log("Someone is out of the game!")
+    else
+      game
+    end
   end
 
   defp calculate_coins(total, n_of_players) do

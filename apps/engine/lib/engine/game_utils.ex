@@ -1,6 +1,10 @@
 defmodule Engine.GameUtils do
   alias Engine.Game
 
+  def log(game = %Game{log: log}, msg) do
+    %{game | log: [msg | log]}
+  end
+
   def next_player(player, players) do
     players =
       players
@@ -19,6 +23,17 @@ defmodule Engine.GameUtils do
 
   def current_player(%Game{player_turn: player, players: players}) do
     Map.get(players, player)
+  end
+
+  def player_id_to_name(game, player_id) do
+    game.players
+    |> Map.get(player_id)
+    |> Map.get(:name)
+  end
+
+  def player_ids_to_names(game, player_ids) do
+    player_ids
+    |> Enum.map(&player_id_to_name(game, &1))
   end
 
   def small_blind_player_id(dealer, players) do
@@ -49,7 +64,7 @@ defmodule Engine.GameUtils do
     players =
       players
       |> Enum.map(fn {k, player} ->
-        {k, %{player | bet: 0, action: nil, active: true}}
+        {k, %{player | bet: 0, action: nil}}
       end)
       |> Enum.into(%{})
 

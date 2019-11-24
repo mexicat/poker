@@ -23,5 +23,6 @@ defmodule Engine.Steps.CallBet do
     |> set_player(game)
     # back to the game struct here
     |> Map.update!(:pot, &(&1 + spent))
+    |> log("#{player.name} called #{game.bet} (spending #{spent})")
   end
 end

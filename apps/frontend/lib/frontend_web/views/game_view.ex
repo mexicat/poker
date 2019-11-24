@@ -17,6 +17,12 @@ defmodule FrontendWeb.GameView do
     cards |> Enum.map(&Engine.Card.to_repr/1) |> Enum.join(" ")
   end
 
+  def log(game) do
+    game.log
+    # |> Enum.reverse()
+    |> Enum.join("\n")
+  end
+
   def minimum_bet(game) do
     case game.bet do
       0 -> game.big_blind

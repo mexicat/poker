@@ -17,5 +17,6 @@ defmodule Engine.Steps.Check do
     |> current_player()
     |> Map.put(:action, :check)
     |> set_player(game)
+    |> log("#{current_player(game).name} checked")
   end
 end
