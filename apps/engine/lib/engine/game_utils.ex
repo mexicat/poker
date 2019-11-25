@@ -1,10 +1,16 @@
 defmodule Engine.GameUtils do
   alias Engine.{Game, LogServer}
 
-  def log(game = %Game{log: nil}, _), do: game
+  def log(game, msg, opts \\ [])
 
-  def log(game = %Game{log: server}, msg) do
-    LogServer.log(server, msg, game)
+  def log(game = %Game{log_server: nil}, msg, _) do
+    %{game | log: [msg | game.log]}
+  end
+
+  def log(game = %Game{log_server: log_server}, msg, opts) do
+    IO.puts(msg)
+    game = %{game | log: [msg | game.log]}
+    LogServer.log(log_server, msg, game, opts)
     game
   end
 
@@ -22,6 +28,13 @@ defmodule Engine.GameUtils do
   def set_player(player, game = %Game{players: players}) do
     players = Map.put(players, game.player_turn, player)
     %{game | players: players}
+  end
+
+  def set_starting_player(game = %Game{dealer: dealer, players: players}) do
+    next_player = small_blind_player_id(dealer, players)
+
+    %{game | player_turn: next_player}
+    |> log("#{player_id_to_name(game, next_player)}'s turn", broadcast: true)
   end
 
   def current_player(%Game{player_turn: player, players: players}) do

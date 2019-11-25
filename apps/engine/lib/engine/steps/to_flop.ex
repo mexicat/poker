@@ -5,9 +5,10 @@ defmodule Engine.Steps.ToFlop do
 
   step :add_cards_to_board
   step :next, with: &Map.put(&1, :phase, :flop)
+  step :set_starting_player, with: &set_starting_player/1
 
   def add_cards_to_board(game = %Game{deck: deck}) do
     %{game | board: Deck.draw_cards(deck, 3)}
-    |> log("Three cards for the flop")
+    |> log("Three cards for the flop", broadcast: true, delay: 3000)
   end
 end

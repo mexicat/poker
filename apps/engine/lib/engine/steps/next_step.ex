@@ -3,8 +3,8 @@ defmodule Engine.Steps.NextStep do
   alias Engine.{Game, Steps}
   use Opus.Pipeline
 
-  link Steps.NextPhase, if: &(!one_player_remaining?(&1) && phase_complete?(&1))
   step :set_next_player, unless: &(!one_player_remaining?(&1) && phase_complete?(&1))
+  link Steps.NextPhase, if: &(!one_player_remaining?(&1) && phase_complete?(&1))
   step :set_winner, if: &one_player_remaining?(&1)
 
   skip :cleanup_stuff, if: &(&1.phase != :finished)
@@ -19,7 +19,7 @@ defmodule Engine.Steps.NextStep do
     next_player = next_player(player, players)
 
     %{game | player_turn: next_player}
-    |> log("#{player_id_to_name(game, next_player)}'s turn")
+    |> log("#{player_id_to_name(game, next_player)}'s turn", broadcast: true)
   end
 
   def set_winner(game = %Game{}) do
@@ -44,7 +44,7 @@ defmodule Engine.Steps.NextStep do
       |> Enum.into(%{})
 
     %{game | players: players, pot: remainder, winners: []}
-    |> log("Distributed #{each} coins to each winner")
+    |> log("Distributed #{each} coins to each winner", broadcast: true, delay: 5000)
   end
 
   def cleanup_dead(game = %Game{players: players}) do

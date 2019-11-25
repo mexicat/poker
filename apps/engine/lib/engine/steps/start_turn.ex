@@ -8,8 +8,8 @@ defmodule Engine.Steps.StartTurn do
   tee :reset_deck, with: &Deck.reset(&1.deck), unless: :initializing
   step :set_blinds
   step :give_cards
-  step :set_current_player
   step :next, with: &Map.put(&1, :phase, :preflop)
+  step :set_current_player
 
   def initializing?(%Game{phase: :initializing}), do: true
   def initializing?(%Game{}), do: false
@@ -70,6 +70,6 @@ defmodule Engine.Steps.StartTurn do
     current_player = turn_start_player_id(dealer, players)
 
     %{game | player_turn: current_player}
-    |> log("#{current_player(game).name}'s turn")
+    |> log("#{current_player(game).name}'s turn", broadcast: true)
   end
 end

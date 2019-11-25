@@ -14,15 +14,15 @@ defmodule Engine.Game do
             winners: [],
             board: [],
             deck: nil,
-            log: nil
+            log: [],
+            log_server: nil
 
-  def new_game(deck, log \\ nil) do
+  def new_game(deck) do
     %Game{
       small_blind: 5,
       big_blind: 10,
       bet: 15,
-      deck: deck,
-      log: log
+      deck: deck
     }
   end
 
@@ -61,7 +61,7 @@ defmodule Engine.Game do
     Steps.Bet.call({game, bet})
   end
 
-  def bet(%Game{}, _) do
+  def bet(%Game{}, _, _) do
     {:error, :not_your_turn}
   end
 

@@ -19,7 +19,6 @@ defmodule FrontendWeb.GameView do
 
   def log(game) do
     game.log
-    |> Engine.LogServer.actions()
     |> Enum.join("\n")
   end
 

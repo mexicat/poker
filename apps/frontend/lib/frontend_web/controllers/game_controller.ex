@@ -10,11 +10,10 @@ defmodule FrontendWeb.GameController do
   def new_game(conn, %{"player_name" => player_name}) do
     game = {:via, _, {_, game_name}} = Engine.new_game()
 
-    {:ok, log_server} =
-      Engine.LogServer.start_link(FrontendWeb.GameLive, :update_clients, game_name)
+    {:ok, log_server} = Engine.LogServer.start_link()
 
-    {:ok, _} = Engine.add_logger(game, log_server)
-    {:ok, player_id, _} = Engine.add_player(game, player_name)
+    :ok = Engine.add_logger(game, log_server)
+    {:ok, player_id} = Engine.add_player(game, player_name)
 
     conn
     |> put_session(:game_name, game_name)
@@ -24,9 +23,9 @@ defmodule FrontendWeb.GameController do
 
   def join_game(conn, %{"game_name" => game_name, "player_name" => player_name}) do
     game = Engine.via_tuple(game_name)
-    {:ok, player_id, game} = Engine.add_player(game, player_name)
+    {:ok, player_id} = Engine.add_player(game, player_name)
 
-    FrontendWeb.GameLive.update_clients(game_name, game)
+    FrontendWeb.GameLive.process_action_queue(game_name)
 
     conn
     |> put_session(:game_name, game_name)
