@@ -29,12 +29,13 @@ defmodule FrontendWeb.GameLive do
       |> Engine.LogServer.process_queue()
       |> Enum.reverse()
 
-    Enum.each(actions, fn {action, game, opts} ->
-      if Keyword.get(opts, :broadcast) do
-        update_clients(game_name, game)
-        # if length(actions) > 1, do: :timer.sleep(1000)
-        # if delay = Keyword.get(opts, :delay), do: :timer.sleep(delay)
-      end
+    Task.start(fn ->
+      Enum.each(actions, fn {action, game, opts} ->
+        if Keyword.get(opts, :broadcast) do
+          update_clients(game_name, game)
+          if delay = Keyword.get(opts, :delay), do: :timer.sleep(delay)
+        end
+      end)
     end)
   end
 
