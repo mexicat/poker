@@ -7,6 +7,7 @@ defmodule Engine.Steps.ToTurn do
   step :next, with: &Map.put(&1, :phase, :turn)
   step :set_starting_player, with: &set_starting_player/1
 
+  @spec add_cards_to_board(Game.t()) :: Game.t()
   def add_cards_to_board(game = %Game{deck: deck, board: board}) do
     %{game | board: board ++ Deck.draw_cards(deck, 1)}
     |> log("One more card for the turn", broadcast: true, delay: 3000)

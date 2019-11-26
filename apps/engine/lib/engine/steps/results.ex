@@ -6,6 +6,7 @@ defmodule Engine.Steps.Results do
   step :determine_winners
   step :next, with: &Map.put(&1, :phase, :finished)
 
+  @spec determine_winners(Game.t()) :: Game.t()
   def determine_winners(game = %Game{}) do
     winning_hands = Score.winning_hands(game.players, game.board)
     winners = for h <- winning_hands, do: h.player

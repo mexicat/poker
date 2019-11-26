@@ -1,5 +1,5 @@
 defmodule Engine.GameUtils do
-  alias Engine.{Game, LogServer}
+  alias Engine.{Game, LogServer, Player}
 
   @doc """
   Adds the `msg` line to the `log` list in the Game struct.
@@ -7,6 +7,7 @@ defmodule Engine.GameUtils do
   struct, and the calling options (like :broadcast and :delay), to
   `LogServer.log`, which is responsible for propagation elsewhere.
   """
+  @spec log(Game.t(), String.t(), [any()]) :: Game.t()
   def log(game, msg, opts \\ [])
 
   def log(game = %Game{log_server: nil}, msg, _) do
@@ -23,7 +24,7 @@ defmodule Engine.GameUtils do
   @doc """
   Given a `player` id and a list of `players`, returns the next player in order.
   """
-  @spec next_player(integer(), Game.players()) :: integer()
+  @spec next_player(integer, Game.players()) :: integer
   def next_player(player, players) do
     players =
       players
@@ -36,9 +37,14 @@ defmodule Engine.GameUtils do
   end
 
   @doc """
-  Given a `player` id, sets a game's current player (`player_turn`) and returns it.
+  Given a `player` struct, puts it into `game.players`, replacing the old one.
+  The struct to replace is selected according to `game.player_turn`, so be
+  careful.
+
+  TODO: probably refactor this so instead of just player you pass {0, %Player{}}
+  and the struct to replace in `players` is chosen automatically.
   """
-  @spec set_player(integer(), Game.t()) :: Game.t()
+  @spec set_player(Player.t(), Game.t()) :: Game.t()
   def set_player(player, game = %Game{players: players}) do
     players = Map.put(players, game.player_turn, player)
     %{game | players: players}
@@ -66,7 +72,7 @@ defmodule Engine.GameUtils do
   @doc """
   Given a `game` and a `player` id, returns the player's name.
   """
-  @spec player_id_to_name(Game.t(), integer()) :: String.t()
+  @spec player_id_to_name(Game.t(), integer) :: String.t()
   def player_id_to_name(game, player_id) do
     game.players
     |> Map.get(player_id)
@@ -76,7 +82,7 @@ defmodule Engine.GameUtils do
   @doc """
   Given a `game` and a list of `player_ids`, returns a list of names.
   """
-  @spec player_ids_to_names(Game.t(), [integer(), ...]) :: [String.t()]
+  @spec player_ids_to_names(Game.t(), [integer, ...]) :: [String.t()]
   def player_ids_to_names(game, player_ids) do
     player_ids
     |> Enum.map(&player_id_to_name(game, &1))

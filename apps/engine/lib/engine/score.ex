@@ -1,5 +1,14 @@
 defmodule Engine.Score do
-  alias Engine.Card
+  alias Engine.{Card, Game, Score}
+
+  @type t :: %Score{
+          player: integer,
+          score: atom(),
+          cards: [Card.t(), ...],
+          ordered: [Card.t(), ...]
+        }
+  @enforce_keys [:score, :cards, :ordered]
+  defstruct [:player, :score, :cards, :ordered]
 
   @scores %{
     high_card: 0,
@@ -15,6 +24,7 @@ defmodule Engine.Score do
   defguardp is_straight(a, b, c, d, e)
             when a - 1 == b and b - 1 == c and c - 1 == d and d - 1 == e
 
+  @spec winning_hands(Game.players(), [Card.t(), ...]) :: [Score.t(), ...]
   def winning_hands(players, board) do
     sorted_hands =
       players
@@ -30,6 +40,7 @@ defmodule Engine.Score do
     |> Enum.filter(&same_values?(best, &1))
   end
 
+  @spec score_hand([Card.t(), ...], integer | nil) :: Score.t()
   def score_hand(cards, player) do
     {score, ordered} =
       cards |> sort_for_straight_flush |> has_straight_flush? ||
@@ -42,7 +53,7 @@ defmodule Engine.Score do
         cards |> sort_by_value |> has_one_pair? ||
         {:high_card, cards |> sort_by_value}
 
-    %{player: player, score: score, cards: cards, ordered: ordered}
+    %Score{player: player, score: score, cards: cards, ordered: ordered}
   end
 
   defp sort_by_value(cards) do

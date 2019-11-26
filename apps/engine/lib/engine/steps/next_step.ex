@@ -15,6 +15,7 @@ defmodule Engine.Steps.NextStep do
   step :finish_game, if: &(map_size(&1.players) == 1)
   link Steps.StartTurn, if: &(map_size(&1.players) > 1)
 
+  @spec set_next_player(Game.t()) :: Game.t()
   def set_next_player(game = %Game{player_turn: player, players: players}) do
     next_player = next_player(player, players)
 
@@ -22,6 +23,7 @@ defmodule Engine.Steps.NextStep do
     |> log("#{player_id_to_name(game, next_player)}'s turn", broadcast: true)
   end
 
+  @spec set_winner(Game.t()) :: Game.t()
   def set_winner(game = %Game{}) do
     winners = for {k, _} <- remaining_players(game), do: k
 
@@ -29,6 +31,7 @@ defmodule Engine.Steps.NextStep do
     |> log("Winner(s): #{game |> player_ids_to_names(winners) |> Enum.join(", ")}")
   end
 
+  @spec distribute_coins(Game.t()) :: Game.t()
   def distribute_coins(game = %Game{winners: winners, players: players, pot: pot}) do
     {each, remainder} = calculate_coins(pot, length(winners))
 
@@ -47,6 +50,7 @@ defmodule Engine.Steps.NextStep do
     |> log("Distributed #{each} coins to each winner", broadcast: true, delay: 5000)
   end
 
+  @spec cleanup_dead(Game.t()) :: Game.t()
   def cleanup_dead(game = %Game{players: players}) do
     new_players =
       players

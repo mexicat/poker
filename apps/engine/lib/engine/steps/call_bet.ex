@@ -7,11 +7,13 @@ defmodule Engine.Steps.CallBet do
   step :accept_call
   link Steps.NextStep
 
+  @spec enough_coins_to_call?(Game.t()) :: boolean
   def enough_coins_to_call?(game = %Game{}) do
     player = current_player(game)
     player.coins >= game.bet - player.bet
   end
 
+  @spec accept_call(Game.t()) :: Game.t()
   def accept_call(game = %Game{}) do
     player = current_player(game)
     spent = game.bet - player.bet

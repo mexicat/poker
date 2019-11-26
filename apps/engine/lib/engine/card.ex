@@ -22,7 +22,7 @@ defmodule Engine.Card do
     iex> Engine.Card.from_string(["AD", "2H"])
     [%Engine.Card{num: 14, suit: :diamonds}, %Engine.Card{num: 2, suit: :hearts}]
   """
-  @spec from_string(binary | [binary]) :: [Card.t()] | Card.t()
+  @spec from_string(String.t() | [String.t(), ...]) :: Card.t() | [Card.t(), ...]
   def from_string(cards) when is_list(cards) do
     for str <- cards, do: from_string(str)
   end
@@ -50,6 +50,7 @@ defmodule Engine.Card do
     iex> Engine.Card.to_repr(%Engine.Card{num: 14, suit: :diamonds})
     "A♦️"
   """
+  @spec to_repr(Card.t()) :: String.t()
   def to_repr(%Card{num: num, suit: suit}) do
     num = Map.get(@num_to_string, num, num)
     suit = Map.get(@suit_to_string, suit)

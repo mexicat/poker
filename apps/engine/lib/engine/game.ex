@@ -2,21 +2,21 @@ defmodule Engine.Game do
   alias __MODULE__
   alias Engine.{GameUtils, Player, Steps}
 
-  @type players :: %{required(integer()) => Engine.Player.t()}
+  @type players :: %{required(integer) => Engine.Player.t()}
   @type t :: %Game{
-          turn: integer(),
+          turn: integer,
           players: players(),
-          player_turn: integer(),
-          phase: atom(),
-          dealer: integer(),
-          small_blind: nil | integer(),
-          big_blind: nil | integer(),
-          pot: integer(),
-          bet: integer(),
-          winners: [integer(), ...],
-          board: [Engine.Card.t(), ...],
-          log: [String.t(), ...],
-          log_server: nil | pid()
+          player_turn: integer,
+          phase: atom,
+          dealer: integer,
+          small_blind: nil | integer,
+          big_blind: nil | integer,
+          pot: integer,
+          bet: integer,
+          winners: [integer],
+          board: [Engine.Card.t()],
+          log: [String.t()],
+          log_server: nil | pid
         }
   defstruct turn: 1,
             players: %{},

@@ -11,9 +11,11 @@ defmodule Engine.Steps.StartTurn do
   step :next, with: &Map.put(&1, :phase, :preflop)
   step :set_current_player
 
+  @spec initializing?(Game.t()) :: boolean
   def initializing?(%Game{phase: :initializing}), do: true
   def initializing?(%Game{}), do: false
 
+  @spec move_positions(Game.t()) :: Game.t()
   def move_positions(game = %Game{players: players, dealer: dealer}) do
     dealer = next_player(dealer, players)
 
@@ -21,6 +23,7 @@ defmodule Engine.Steps.StartTurn do
     |> log("Moved the dealer")
   end
 
+  @spec set_blinds(Game.t()) :: Game.t()
   def set_blinds(
         game = %Game{
           players: players,
@@ -54,6 +57,7 @@ defmodule Engine.Steps.StartTurn do
     )
   end
 
+  @spec give_cards(Game.t()) :: Game.t()
   def give_cards(game = %Game{players: players, deck: deck}) do
     players =
       players
@@ -66,6 +70,7 @@ defmodule Engine.Steps.StartTurn do
     |> log("Cards distributed to the players")
   end
 
+  @spec set_current_player(Game.t()) :: Game.t()
   def set_current_player(game = %Game{players: players, dealer: dealer}) do
     current_player = turn_start_player_id(dealer, players)
 

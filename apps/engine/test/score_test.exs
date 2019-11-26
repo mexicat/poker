@@ -79,4 +79,30 @@ defmodule ScoreTest do
     assert %{score: :high_card} =
              Card.from_string(~w/2S 10D KS 6S AS 9D 3C/) |> Score.score_hand(0)
   end
+
+  test "best hand wins" do
+    players = %{
+      0 => %{hand: Card.from_string(~w/4S 4C/)},
+      1 => %{hand: Card.from_string(~w/3S 3C/)},
+      2 => %{hand: Card.from_string(~w/5S 6C/)}
+    }
+
+    board = Card.from_string(~w/4H AD AH 7D/)
+
+    assert [%Score{player: 0}] = Score.winning_hands(players, board)
+  end
+
+  test "multiple winners" do
+    players = %{
+      0 => %{hand: Card.from_string(~w/4S 4C/)},
+      1 => %{hand: Card.from_string(~w/3S 3C/)}
+    }
+
+    board = Card.from_string(~w/9S 9D AD AH AC/)
+
+    assert [
+             %Score{player: 0, score: :full_house},
+             %Score{player: 1, score: :full_house}
+           ] = Score.winning_hands(players, board)
+  end
 end
