@@ -2,6 +2,22 @@ defmodule Engine.Game do
   alias __MODULE__
   alias Engine.{GameUtils, Player, Steps}
 
+  @type players :: %{required(integer()) => Engine.Player.t()}
+  @type t :: %Game{
+          turn: integer(),
+          players: players(),
+          player_turn: integer(),
+          phase: atom(),
+          dealer: integer(),
+          small_blind: nil | integer(),
+          big_blind: nil | integer(),
+          pot: integer(),
+          bet: integer(),
+          winners: [integer(), ...],
+          board: [Engine.Card.t(), ...],
+          log: [String.t(), ...],
+          log_server: nil | pid()
+        }
   defstruct turn: 1,
             players: %{},
             player_turn: 0,
@@ -32,7 +48,7 @@ defmodule Engine.Game do
 
     game =
       %{game | players: Map.put(players, id, new_player)}
-      |> GameUtils.log("#{name} joined the game")
+      |> GameUtils.log("#{name} joined the game", broadcast: true)
 
     {:ok, id, game}
   end
@@ -41,7 +57,7 @@ defmodule Engine.Game do
     {:error, :cannot_add_players_after_game_start}
   end
 
-  def start_game(%{phase: :initializing, players: players}) when map_size(players) < 3 do
+  def start_game(%Game{phase: :initializing, players: players}) when map_size(players) < 3 do
     {:error, :not_enough_players}
   end
 

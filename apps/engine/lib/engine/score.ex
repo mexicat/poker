@@ -18,7 +18,7 @@ defmodule Engine.Score do
   def winning_hands(players, board) do
     sorted_hands =
       players
-      |> Enum.map(fn {k, player} -> score_hand(k, player.hand ++ board) end)
+      |> Enum.map(fn {k, player} -> score_hand(player.hand ++ board, k) end)
       |> Enum.sort_by(
         &{@scores[&1.score], Enum.map(&1.ordered, fn %Card{num: n} -> n end)},
         &>=/2
@@ -30,7 +30,7 @@ defmodule Engine.Score do
     |> Enum.filter(&same_values?(best, &1))
   end
 
-  def score_hand(player, cards) do
+  def score_hand(cards, player) do
     {score, ordered} =
       cards |> sort_for_straight_flush |> has_straight_flush? ||
         cards |> sort_by_value |> has_four_of_a_kind? ||
