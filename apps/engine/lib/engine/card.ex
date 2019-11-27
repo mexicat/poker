@@ -15,12 +15,12 @@ defmodule Engine.Card do
 
   ## Examples
 
-    iex> Engine.Card.from_string("JS")
-    %Engine.Card{num: 11, suit: :spades}
-    iex> Engine.Card.from_string("10C")
-    %Engine.Card{num: 10, suit: :clubs}
-    iex> Engine.Card.from_string(["AD", "2H"])
-    [%Engine.Card{num: 14, suit: :diamonds}, %Engine.Card{num: 2, suit: :hearts}]
+      iex> Engine.Card.from_string("JS")
+      %Engine.Card{num: 11, suit: :spades}
+      iex> Engine.Card.from_string("10C")
+      %Engine.Card{num: 10, suit: :clubs}
+      iex> Engine.Card.from_string(["AD", "2H"])
+      [%Engine.Card{num: 14, suit: :diamonds}, %Engine.Card{num: 2, suit: :hearts}]
   """
   @spec from_string(String.t() | [String.t(), ...]) :: Card.t() | [Card.t(), ...]
   def from_string(cards) when is_list(cards) do
@@ -43,12 +43,12 @@ defmodule Engine.Card do
 
   ## Examples
 
-    iex> Engine.Card.to_repr(%Engine.Card{num: 10, suit: :clubs})
-    "10♣️"
-    iex> Engine.Card.to_repr(%Engine.Card{num: 1, suit: :hearts})
-    "A♥️"
-    iex> Engine.Card.to_repr(%Engine.Card{num: 14, suit: :diamonds})
-    "A♦️"
+      iex> Engine.Card.to_repr(%Engine.Card{num: 10, suit: :clubs})
+      "10♣️"
+      iex> Engine.Card.to_repr(%Engine.Card{num: 1, suit: :hearts})
+      "A♥️"
+      iex> Engine.Card.to_repr(%Engine.Card{num: 14, suit: :diamonds})
+      "A♦️"
   """
   @spec to_repr(Card.t()) :: String.t()
   def to_repr(%Card{num: num, suit: suit}) do

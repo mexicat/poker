@@ -5,7 +5,7 @@ defmodule Engine.Steps.StartTurn do
 
   step :update_turn, with: &Map.put(&1, :turn, &1.turn + 1), unless: :initializing?
   step :move_positions, unless: :initializing?
-  tee :reset_deck, with: &Deck.reset(&1.deck), unless: :initializing
+  step :reset_deck, with: &Map.put(&1, :deck, Deck.new()), unless: :initializing
   step :set_blinds
   step :give_cards
   step :next, with: &Map.put(&1, :phase, :preflop)
@@ -59,14 +59,14 @@ defmodule Engine.Steps.StartTurn do
 
   @spec give_cards(Game.t()) :: Game.t()
   def give_cards(game = %Game{players: players, deck: deck}) do
-    players =
+    {players, deck} =
       players
-      |> Enum.map(fn {id, player} ->
-        {id, Map.put(player, :hand, Deck.draw_cards(deck, 2))}
+      |> Enum.map_reduce(deck, fn {id, player}, cards ->
+        {hand, deck} = Deck.draw_cards(cards, 2)
+        {{id, Map.put(player, :hand, hand)}, deck}
       end)
-      |> Enum.into(%{})
 
-    %{game | players: players}
+    %{game | players: Enum.into(players, %{}), deck: deck}
     |> log("Cards distributed to the players")
   end
 

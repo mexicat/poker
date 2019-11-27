@@ -7,8 +7,7 @@ defmodule Engine.GameServer do
   end
 
   def init(_) do
-    {:ok, deck} = Engine.Deck.start_link()
-    {:ok, Game.new_game(deck)}
+    {:ok, Game.new_game()}
   end
 
   def handle_call(:start_game, _from, game) do

@@ -4,8 +4,7 @@ defmodule GameTest do
   doctest Engine.Game
 
   setup do
-    {:ok, deck} = Engine.Deck.start_link()
-    game = Game.new_game(deck)
+    game = Game.new_game()
 
     %{game: game}
   end

@@ -9,7 +9,9 @@ defmodule Engine.Steps.ToTurn do
 
   @spec add_cards_to_board(Game.t()) :: Game.t()
   def add_cards_to_board(game = %Game{deck: deck, board: board}) do
-    %{game | board: board ++ Deck.draw_cards(deck, 1)}
+    {turn, deck} = Deck.draw_cards(deck, 1)
+
+    %{game | deck: deck, board: board ++ turn}
     |> log("One more card for the turn", broadcast: true, delay: 3000)
   end
 end

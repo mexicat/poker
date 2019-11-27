@@ -9,7 +9,9 @@ defmodule Engine.Steps.ToRiver do
 
   @spec add_cards_to_board(Game.t()) :: Game.t()
   def add_cards_to_board(game = %Game{deck: deck, board: board}) do
-    %{game | board: board ++ Deck.draw_cards(deck, 1)}
+    {river, deck} = Deck.draw_cards(deck, 1)
+
+    %{game | deck: deck, board: board ++ river}
     |> log("One last card for the river", broadcast: true, delay: 3000)
   end
 end

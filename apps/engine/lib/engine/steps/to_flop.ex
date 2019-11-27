@@ -9,7 +9,9 @@ defmodule Engine.Steps.ToFlop do
 
   @spec add_cards_to_board(Game.t()) :: Game.t()
   def add_cards_to_board(game = %Game{deck: deck}) do
-    %{game | board: Deck.draw_cards(deck, 3)}
+    {flop, deck} = Deck.draw_cards(deck, 3)
+
+    %{game | deck: deck, board: flop}
     |> log("Three cards for the flop", broadcast: true, delay: 3000)
   end
 end

@@ -1,6 +1,6 @@
 defmodule Engine.Game do
   alias __MODULE__
-  alias Engine.{GameUtils, Player, Steps}
+  alias Engine.{Deck, GameUtils, Player, Steps}
 
   @type players :: %{required(integer) => Engine.Player.t()}
   @type t :: %Game{
@@ -15,6 +15,7 @@ defmodule Engine.Game do
           bet: integer,
           winners: [integer],
           board: [Engine.Card.t()],
+          deck: Deck.t() | nil,
           log: [String.t()],
           log_server: nil | pid
         }
@@ -33,12 +34,12 @@ defmodule Engine.Game do
             log: [],
             log_server: nil
 
-  def new_game(deck) do
+  def new_game() do
     %Game{
       small_blind: 5,
       big_blind: 10,
       bet: 15,
-      deck: deck
+      deck: Deck.new()
     }
   end
 
