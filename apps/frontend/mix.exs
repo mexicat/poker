@@ -23,7 +23,7 @@ defmodule Frontend.MixProject do
   def application do
     [
       mod: {Frontend.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :phoenix_ecto]
     ]
   end
 
@@ -38,6 +38,7 @@ defmodule Frontend.MixProject do
     [
       {:phoenix, "~> 1.4.11"},
       {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.4.0"},

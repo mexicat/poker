@@ -12,7 +12,10 @@ defmodule Poker.MixProject do
   end
 
   defp deps do
-    [{:dialyxir, "~> 0.5", only: [:dev], runtime: false}]
+    [
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+    ]
   end
 
   defp releases do

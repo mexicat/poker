@@ -2,32 +2,36 @@ defmodule FrontendWeb.GameController do
   use FrontendWeb, :controller
   alias Phoenix.LiveView.Controller
   import Phoenix.PubSub
+  alias Frontend.GameForm
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    changeset = GameForm.changeset(%GameForm{}, %{})
+    render(conn, "index.html", changeset: changeset)
   end
 
-  def new_game(conn, %{
-        "player_name" => player_name,
-        "small_blind" => small_blind,
-        "player_coins" => player_coins
-      }) do
-    game =
-      {:via, _, {_, game_name}} =
-      Engine.new_game(
-        small_blind: String.to_integer(small_blind),
-        player_coins: String.to_integer(player_coins)
-      )
+  def new_game(conn, %{"game_form" => game_params}) do
+    case GameForm.new_game(%GameForm{}, game_params) do
+      {:ok, game_form} ->
+        game =
+          {:via, _, {_, game_name}} =
+          Engine.new_game(
+            small_blind: game_form.small_blind,
+            player_coins: game_form.player_coins
+          )
 
-    {:ok, log_server} = Engine.LogServer.start_link()
+        {:ok, log_server} = Engine.LogServer.start_link()
 
-    :ok = Engine.add_logger(game, log_server)
-    {:ok, player_id} = Engine.add_player(game, player_name)
+        :ok = Engine.add_logger(game, log_server)
+        {:ok, player_id} = Engine.add_player(game, game_form.player_name)
 
-    conn
-    |> put_session(:game_name, game_name)
-    |> put_session(:player_id, player_id)
-    |> redirect(to: "/game")
+        conn
+        |> put_session(:game_name, game_name)
+        |> put_session(:player_id, player_id)
+        |> redirect(to: "/game")
+
+      {:error, changeset} ->
+        render(conn, "index.html", changeset: changeset)
+    end
   end
 
   def join_game(conn, %{"game_name" => game_name, "player_name" => player_name}) do
