@@ -28,24 +28,29 @@ defmodule Engine.Game do
             big_blind: nil,
             pot: 0,
             bet: 0,
+            player_coins: 100,
             winners: [],
             board: [],
             deck: nil,
             log: [],
             log_server: nil
 
-  def new_game() do
+  def new_game(options \\ []) do
+    small_blind = Keyword.get(options, :small_blind, 5)
+    big_blind = small_blind * 2
+
     %Game{
-      small_blind: 5,
-      big_blind: 10,
-      bet: 15,
+      small_blind: small_blind,
+      big_blind: big_blind,
+      bet: big_blind,
+      player_coins: Keyword.get(options, :player_coins, 100),
       deck: Deck.new()
     }
   end
 
   def add_player(game = %Game{phase: :initializing, players: players}, name) do
     id = Enum.count(players)
-    new_player = %Player{name: name}
+    new_player = %Player{name: name, coins: game.player_coins}
 
     game =
       %{game | players: Map.put(players, id, new_player)}
@@ -58,6 +63,8 @@ defmodule Engine.Game do
     {:error, :cannot_add_players_after_game_start}
   end
 
+  @spec start_game(%{phase: :initializing}) ::
+          {:error, :not_enough_players | Opus.PipelineError.t()} | {:ok, any}
   def start_game(%Game{phase: :initializing, players: players}) when map_size(players) < 3 do
     {:error, :not_enough_players}
   end

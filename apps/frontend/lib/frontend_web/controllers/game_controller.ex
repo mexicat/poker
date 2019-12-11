@@ -7,8 +7,17 @@ defmodule FrontendWeb.GameController do
     render(conn, "index.html")
   end
 
-  def new_game(conn, %{"player_name" => player_name}) do
-    game = {:via, _, {_, game_name}} = Engine.new_game()
+  def new_game(conn, %{
+        "player_name" => player_name,
+        "small_blind" => small_blind,
+        "player_coins" => player_coins
+      }) do
+    game =
+      {:via, _, {_, game_name}} =
+      Engine.new_game(
+        small_blind: String.to_integer(small_blind),
+        player_coins: String.to_integer(player_coins)
+      )
 
     {:ok, log_server} = Engine.LogServer.start_link()
 

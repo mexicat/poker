@@ -3,7 +3,7 @@ defmodule Engine do
     {:via, Registry, {Engine.GameRegistry, name}}
   end
 
-  def new_game() do
+  def new_game(options \\ []) do
     name =
       ?a..?z
       |> Enum.take_random(6)
@@ -12,7 +12,7 @@ defmodule Engine do
     {:ok, _} =
       DynamicSupervisor.start_child(
         Engine.GameSupervisor,
-        {Engine.GameServer, via_tuple(name)}
+        {Engine.GameServer, Keyword.merge(options, name: via_tuple(name))}
       )
 
     via_tuple(name)

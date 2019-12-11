@@ -2,12 +2,13 @@ defmodule Engine.GameServer do
   alias Engine.Game
   use GenServer
 
-  def start_link(name) do
-    GenServer.start_link(__MODULE__, [], name: name)
+  def start_link(options) do
+    {name, options} = Keyword.pop(options, :name)
+    GenServer.start_link(__MODULE__, options, name: name)
   end
 
-  def init(_) do
-    {:ok, Game.new_game()}
+  def init(options \\ []) do
+    {:ok, Game.new_game(options)}
   end
 
   def handle_call(:start_game, _from, game) do
